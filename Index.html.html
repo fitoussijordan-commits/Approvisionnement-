@@ -1,0 +1,2399 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Approvisionnements</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #ffffff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            overflow: hidden;
+            border: 1px solid #e8e8e8;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4a5f4f 0%, #6b8068 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .tabs {
+            display: flex;
+            background: #fafafa;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px 20px;
+            text-align: center;
+            cursor: pointer;
+            background: #fafafa;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            color: #666;
+        }
+
+        .tab:hover {
+            background: #f0f0f0;
+        }
+
+        .tab.active {
+            background: white;
+            color: #4a5f4f;
+            border-bottom: 3px solid #6b8068;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+            animation: fadeIn 0.3s;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #fafafa;
+            border-radius: 8px;
+            border-left: 4px solid #6b8068;
+        }
+
+        .section h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #6b8068;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin-right: 10px;
+            margin-top: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4a5f4f 0%, #6b8068 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(75, 95, 79, 0.3);
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn-info:hover {
+            background: #138496;
+            transform: translateY(-2px);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        th {
+            background: linear-gradient(135deg, #4a5f4f 0%, #6b8068 100%);
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        tr:hover {
+            background: #f5f5f5;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border-left: 4px solid #ffc107;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-left: 4px solid #17a2b8;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-left: 4px solid #667eea;
+        }
+
+        .stat-card h3 {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            font-size: 14px;
+            margin: 2px;
+        }
+
+        .highlight-red {
+            background: #ffebee !important;
+        }
+
+        .highlight-green {
+            background: #e8f5e9 !important;
+        }
+
+        .highlight-yellow {
+            background: #fff9c4 !important;
+        }
+
+        .search-box {
+            margin-bottom: 20px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .file-input-label {
+            display: inline-block;
+            padding: 12px 30px;
+            background: #667eea;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .file-input-label:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+
+        .file-name {
+            display: inline-block;
+            margin-left: 10px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .grid-2col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .grid-2col {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #667eea;
+            font-size: 18px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .empty-state i {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div style="display: flex; align-items: center; justify-content: center; gap: 20px;">
+                <img src="logo-dr-hauschka.png" 
+                     alt="Dr. Hauschka" 
+                     style="height: 50px; background: white; padding: 10px; border-radius: 8px;"
+                     onerror="this.style.display='none'">
+                <div>
+                    <h1 style="margin: 0;">🚚 Gestion des Approvisionnements</h1>
+                    <p style="margin: 5px 0 0 0;">Système de gestion automatisé des stocks et commandes</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('referentiel')">📋 Référentiel Produits</button>
+            <button class="tab" onclick="switchTab('import')">📥 Import Données</button>
+            <button class="tab" onclick="switchTab('calcul')">🧮 Calcul Commande</button>
+            <button class="tab" onclick="switchTab('confirmation')">✅ Order Confirmation</button>
+            <button class="tab" onclick="switchTab('alertes')">⚠️ Alertes Stock</button>
+            <button class="tab" onclick="switchTab('dashboard')">📊 Dashboard</button>
+        </div>
+
+        <!-- TAB 1: RÉFÉRENTIEL PRODUITS -->
+        <div id="referentiel" class="tab-content active">
+            <div class="section">
+                <h2>Ajouter un produit</h2>
+                <div class="grid-2col">
+                    <div class="form-group">
+                        <label>Référence FR: <span style="color: red;">*</span></label>
+                        <input type="text" id="refFR" placeholder="Ex: FR001">
+                    </div>
+                    <div class="form-group">
+                        <label>Référence ALL: <span style="color: #999;">(optionnel)</span></label>
+                        <input type="text" id="refALL" placeholder="Ex: DE001">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Désignation: <span style="color: red;">*</span></label>
+                    <input type="text" id="designation" placeholder="Ex: Produit X">
+                </div>
+                <div class="grid-2col">
+                    <div class="form-group">
+                        <label>Prix d'achat (€):</label>
+                        <input type="number" step="0.01" id="prixAchat" placeholder="Ex: 12.50">
+                    </div>
+                    <div class="form-group">
+                        <label>Colisage:</label>
+                        <input type="number" id="colisage" placeholder="Ex: 12">
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="ajouterProduit()">➕ Ajouter le produit</button>
+                <button class="btn btn-info" onclick="importerReferentiel()">📥 Importer référentiel (CSV/Excel)</button>
+                <button class="btn btn-success" onclick="exporterReferentiel()">📤 Exporter référentiel</button>
+            </div>
+
+            <div class="section">
+                <h2>Liste des produits</h2>
+                <div class="search-box">
+                    <input type="text" id="searchRef" placeholder="🔍 Rechercher un produit..." oninput="filtrerReferentiel()">
+                </div>
+                <div id="listeReferentiel"></div>
+            </div>
+        </div>
+
+        <!-- TAB 2: IMPORT DONNÉES -->
+        <div id="import" class="tab-content">
+            <div class="alert alert-info">
+                <strong>ℹ️ Format attendu:</strong> Fichiers CSV ou Excel avec colonnes: Réf FR ou Réf ALL, et les données correspondantes
+            </div>
+
+            <div class="section">
+                <h2>📦 Import Stock Actuel</h2>
+                <p style="margin-bottom: 15px; color: #666;">Colonnes attendues: Réf FR (ou Réf ALL) | Stock</p>
+                <div class="file-input-wrapper">
+                    <input type="file" id="fileStock" accept=".csv,.xlsx,.xls" onchange="updateFileName('fileStock', 'fileNameStock')">
+                    <label for="fileStock" class="file-input-label">Choisir un fichier</label>
+                    <span class="file-name" id="fileNameStock">Aucun fichier sélectionné</span>
+                </div>
+                <button class="btn btn-primary" onclick="importerStock()">📥 Importer Stock</button>
+            </div>
+
+            <div class="section">
+                <h2>📊 Import Consommation Mensuelle</h2>
+                <p style="margin-bottom: 15px; color: #666;">
+                    <strong>Format attendu:</strong> Colonne A avec référence entre crochets [XXXXX] + colonnes avec mois (janvier 2024, février 2024, etc.)<br>
+                    <strong>📐 Calcul:</strong> Moyenne automatique sur les <strong>12 derniers mois</strong> à partir du mois actuel<br>
+                    <em>Exemple: [1820102] Crème pour les Mains | janvier 2024 | février 2024 | ...</em>
+                </p>
+                <div class="file-input-wrapper">
+                    <input type="file" id="fileConso" accept=".csv,.xlsx,.xls" onchange="updateFileName('fileConso', 'fileNameConso')">
+                    <label for="fileConso" class="file-input-label">Choisir un fichier</label>
+                    <span class="file-name" id="fileNameConso">Aucun fichier sélectionné</span>
+                </div>
+                <button class="btn btn-primary" onclick="importerConso()">📥 Importer Conso</button>
+            </div>
+
+            <div class="section">
+                <h2>📈 Import Forecast</h2>
+                <p style="margin-bottom: 15px; color: #666;">
+                    <strong>Colonnes attendues:</strong> Réf FR | Réf ALL | Désignation | J | F | M | A | M | J | J | A | S | O | N | D<br>
+                    <em>Initiales acceptées: J (Janvier), F (Février), M (Mars), A (Avril), etc.</em>
+                </p>
+                <div class="form-group">
+                    <label><strong>📅 Sélectionnez le mois pour lequel vous passez commande :</strong></label>
+                    <select id="moisForecast" style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 5px; font-size: 16px;">
+                        <option value="0">Janvier (J)</option>
+                        <option value="1">Février (F)</option>
+                        <option value="2">Mars (M)</option>
+                        <option value="3">Avril (A)</option>
+                        <option value="4">Mai (M)</option>
+                        <option value="5">Juin (J)</option>
+                        <option value="6">Juillet (J)</option>
+                        <option value="7">Août (A)</option>
+                        <option value="8">Septembre (S)</option>
+                        <option value="9">Octobre (O)</option>
+                        <option value="10">Novembre (N)</option>
+                        <option value="11">Décembre (D)</option>
+                    </select>
+                </div>
+                <div class="file-input-wrapper">
+                    <input type="file" id="fileForecast" accept=".csv,.xlsx,.xls" onchange="updateFileName('fileForecast', 'fileNameForecast')">
+                    <label for="fileForecast" class="file-input-label">Choisir un fichier</label>
+                    <span class="file-name" id="fileNameForecast">Aucun fichier sélectionné</span>
+                </div>
+                <button class="btn btn-primary" onclick="importerForecast()">📥 Importer Forecast</button>
+            </div>
+
+            <div class="section">
+                <h2>📋 État des imports</h2>
+                <div id="etatImports"></div>
+            </div>
+        </div>
+
+        <!-- TAB 3: CALCUL COMMANDE -->
+        <div id="calcul" class="tab-content">
+            <div class="alert alert-info">
+                <strong>📐 Nouvelle formule optimisée:</strong><br>
+                1️⃣ Conso sur 20 jours = (Conso mensuelle ÷ 30) × 20 jours<br>
+                2️⃣ Stock au 5 novembre = Stock actuel - Conso sur 20 jours<br>
+                3️⃣ Besoin au 5 novembre = 2 × Conso mensuelle<br>
+                4️⃣ <strong>Qté à commander = Besoin - Stock au 5 nov + Forecast</strong><br>
+                <br>
+                📅 <em>Commande passée le 15 → Réception le 5 du mois suivant (20 jours)</em>
+            </div>
+
+            <div class="section">
+                <h2>⚙️ Règles spéciales</h2>
+                <p style="margin-bottom: 15px; color: #666;">
+                    Pour certains produits, vous pouvez définir une commande basée <strong>uniquement sur le forecast</strong> (sans réassort automatique).
+                </p>
+                
+                <div class="form-group">
+                    <label>Sélectionnez les produits à commander uniquement sur forecast :</label>
+                    <select id="selectProduitRegle" style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 5px; font-size: 14px;">
+                        <option value="">-- Choisir un produit --</option>
+                    </select>
+                    <button class="btn btn-primary" style="margin-top: 10px;" onclick="ajouterRegleSpeciale()">➕ Ajouter cette règle</button>
+                </div>
+
+                <div class="form-group" style="margin-top: 20px;">
+                    <label><strong>Produits en mode "Forecast Only" :</strong></label>
+                    <div id="listeReglesSpeciales" style="margin-top: 10px; padding: 15px; background: #f9f9f9; border-radius: 5px; min-height: 50px;">
+                        <em style="color: #999;">Aucune règle définie</em>
+                    </div>
+                </div>
+
+                <div id="messageRegles" style="margin-top: 10px;"></div>
+            </div>
+
+            <div class="section">
+                <button class="btn btn-primary" onclick="calculerCommande()">🧮 Calculer les besoins</button>
+                <button class="btn btn-success" onclick="exporterCommande()">📤 Exporter la commande</button>
+                <button class="btn btn-warning" onclick="reinitialiserDonnees()">🔄 Réinitialiser les données</button>
+            </div>
+
+            <div class="section">
+                <h2>Résultats du calcul</h2>
+                <div id="resultatCalcul"></div>
+            </div>
+        </div>
+
+        <!-- TAB 4: ORDER CONFIRMATION -->
+        <div id="confirmation" class="tab-content">
+            <div class="alert alert-info">
+                <strong>ℹ️ Étape:</strong> Importez l'Order Confirmation du fournisseur<br>
+                📊 <strong>Colonnes utilisées automatiquement :</strong><br>
+                • Colonne <strong>G</strong> : Article-No. (Réf ALL)<br>
+                • Colonne <strong>J</strong> : Quantity order<br>
+                • Colonne <strong>K</strong> : Quantity available<br>
+                <em>Le système prendra la colonne K si disponible, sinon la colonne J</em>
+            </div>
+
+            <div class="section">
+                <h2>📥 Import Order Confirmation</h2>
+                <p style="margin-bottom: 15px; color: #666;">Importez directement votre fichier Excel du fournisseur (format original)</p>
+                <div class="file-input-wrapper">
+                    <input type="file" id="fileConfirmation" accept=".csv,.xlsx,.xls" onchange="updateFileName('fileConfirmation', 'fileNameConfirmation')">
+                    <label for="fileConfirmation" class="file-input-label">Choisir un fichier</label>
+                    <span class="file-name" id="fileNameConfirmation">Aucun fichier sélectionné</span>
+                </div>
+                <button class="btn btn-primary" onclick="importerConfirmation()">📥 Importer & Comparer</button>
+            </div>
+
+            <div class="section">
+                <h2>📊 Comparaison Commande vs Confirmation</h2>
+                <div id="resultatConfirmation"></div>
+            </div>
+        </div>
+
+        <!-- TAB 5: ALERTES STOCK -->
+        <div id="alertes" class="tab-content">
+            <div class="section">
+                <h2>⚠️ Prévision & Alerte de Stock</h2>
+                <p>Simulez l'évolution de vos stocks jusqu'à votre prochaine réception</p>
+                
+                <div class="grid-2col">
+                    <div class="form-group">
+                        <label>📅 Date de la prochaine réception:</label>
+                        <input type="date" id="dateReception" onchange="calculerAlertes()">
+                    </div>
+                    <div class="form-group">
+                        <label>📊 Afficher:</label>
+                        <select id="filtreAlertes" onchange="calculerAlertes()">
+                            <option value="tous">Tous les produits</option>
+                            <option value="rupture">⛔ Rupture actuelle uniquement</option>
+                            <option value="alerte">⚠️ Alerte stock (risque rupture)</option>
+                            <option value="critique">🔴 Critique (rupture + alerte)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <button class="btn btn-primary" onclick="calculerAlertes()">🔍 Analyser les stocks</button>
+                    <button class="btn btn-success" onclick="exporterAlertes()">📥 Exporter les alertes</button>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>📊 Résultats de l'analyse</h2>
+                <div id="statsAlertes" style="margin-bottom: 20px;"></div>
+                <div class="search-box">
+                    <input type="text" id="searchAlertes" placeholder="🔍 Rechercher un produit..." oninput="filtrerAlertes()">
+                </div>
+                <div id="tableauAlertes"></div>
+            </div>
+        </div>
+
+        <!-- TAB 6: DASHBOARD -->
+        <div id="dashboard" class="tab-content">
+            <div class="section">
+                <h2>📊 Vue d'ensemble</h2>
+                <div class="stats-grid" id="statsGrid"></div>
+            </div>
+
+            <div class="section">
+                <h2>📋 Tableau complet</h2>
+                <div class="search-box">
+                    <input type="text" id="searchDashboard" placeholder="🔍 Rechercher..." oninput="filtrerDashboard()">
+                </div>
+                <div id="tableauComplet"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script>
+        // Base de données locale
+        let database = {
+            produits: [],
+            stocks: {},
+            conso: {},
+            forecast: {},
+            commande: {},
+            confirmation: {},
+            confirmationDetails: {}, // Détails des colonnes J et K
+            reglesSpeciales: {
+                forecastOnly: [] // Liste des références à commander uniquement sur forecast
+            }
+        };
+
+        // Charger les données au démarrage
+        window.onload = function() {
+            chargerDonnees();
+            afficherReferentiel();
+            afficherEtatImports();
+            afficherDashboard();
+            
+            // Définir le mois actuel par défaut dans le sélecteur de forecast
+            const moisActuel = new Date().getMonth();
+            const selectMois = document.getElementById('moisForecast');
+            if (selectMois) {
+                selectMois.value = moisActuel.toString();
+            }
+            
+            // Charger les règles spéciales
+            chargerReglesSpeciales();
+        };
+
+        // Fonction pour peupler la liste déroulante des produits
+        function peuplerSelectProduits() {
+            const select = document.getElementById('selectProduitRegle');
+            if (!select) return;
+            
+            // Garder l'option par défaut
+            select.innerHTML = '<option value="">-- Choisir un produit --</option>';
+            
+            // Ajouter tous les produits
+            database.produits.forEach(produit => {
+                const option = document.createElement('option');
+                option.value = produit.refFR;
+                option.textContent = `${produit.refFR} - ${produit.designation}`;
+                select.appendChild(option);
+            });
+        }
+
+        // Fonction pour ajouter une règle spéciale
+        function ajouterRegleSpeciale() {
+            const select = document.getElementById('selectProduitRegle');
+            const refFR = select.value;
+            
+            if (!refFR) {
+                alert('⚠️ Veuillez sélectionner un produit');
+                return;
+            }
+            
+            // Initialiser si nécessaire
+            if (!database.reglesSpeciales) {
+                database.reglesSpeciales = { forecastOnly: [] };
+            }
+            if (!database.reglesSpeciales.forecastOnly) {
+                database.reglesSpeciales.forecastOnly = [];
+            }
+            
+            // Vérifier si la règle existe déjà
+            if (database.reglesSpeciales.forecastOnly.includes(refFR)) {
+                alert('⚠️ Cette règle existe déjà pour ce produit');
+                return;
+            }
+            
+            // Ajouter la règle
+            database.reglesSpeciales.forecastOnly.push(refFR);
+            sauvegarderDonnees();
+            afficherReglesSpeciales();
+            
+            // Réinitialiser le select
+            select.value = '';
+            
+            const messageDiv = document.getElementById('messageRegles');
+            messageDiv.innerHTML = `<div class="alert alert-success">✅ Règle ajoutée pour ${refFR}</div>`;
+            setTimeout(() => {
+                messageDiv.innerHTML = '';
+            }, 2000);
+        }
+
+        // Fonction pour supprimer une règle spéciale
+        function supprimerRegleSpeciale(refFR) {
+            if (confirm(`⚠️ Supprimer la règle "Forecast Only" pour ${refFR} ?`)) {
+                const index = database.reglesSpeciales.forecastOnly.indexOf(refFR);
+                if (index > -1) {
+                    database.reglesSpeciales.forecastOnly.splice(index, 1);
+                    sauvegarderDonnees();
+                    afficherReglesSpeciales();
+                }
+            }
+        }
+
+        // Fonction pour afficher la liste des règles spéciales
+        function afficherReglesSpeciales() {
+            const container = document.getElementById('listeReglesSpeciales');
+            if (!container) return;
+            
+            if (!database.reglesSpeciales || !database.reglesSpeciales.forecastOnly || database.reglesSpeciales.forecastOnly.length === 0) {
+                container.innerHTML = '<em style="color: #999;">Aucune règle définie</em>';
+                return;
+            }
+            
+            let html = '';
+            database.reglesSpeciales.forecastOnly.forEach(refFR => {
+                const produit = database.produits.find(p => p.refFR === refFR);
+                const designation = produit ? produit.designation : 'Produit non trouvé';
+                
+                html += `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: white; border-radius: 5px; margin-bottom: 8px; border-left: 4px solid #667eea;">
+                        <div>
+                            <strong style="color: #667eea;">🎯 ${refFR}</strong> - ${designation}
+                        </div>
+                        <button class="btn btn-danger action-btn" onclick="supprimerRegleSpeciale('${refFR}')">🗑️ Supprimer</button>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // Fonction pour charger les règles spéciales au démarrage
+        function chargerReglesSpeciales() {
+            peuplerSelectProduits();
+            afficherReglesSpeciales();
+        }
+
+        // Fonction pour vérifier si une référence est en mode forecast only
+        function estForecastOnly(refFR) {
+            if (!database.reglesSpeciales || !database.reglesSpeciales.forecastOnly) {
+                return false;
+            }
+            return database.reglesSpeciales.forecastOnly.includes(refFR);
+        }
+
+        // Gestion des onglets
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+            
+            // Rafraîchir l'affichage si nécessaire
+            if (tabName === 'referentiel') afficherReferentiel();
+            if (tabName === 'import') afficherEtatImports();
+            if (tabName === 'dashboard') afficherDashboard();
+        }
+
+        // Sauvegarder dans localStorage
+        function sauvegarderDonnees() {
+            localStorage.setItem('appro_database', JSON.stringify(database));
+        }
+
+        // Charger depuis localStorage
+        function chargerDonnees() {
+            const saved = localStorage.getItem('appro_database');
+            if (saved) {
+                database = JSON.parse(saved);
+            }
+        }
+
+        // RÉFÉRENTIEL PRODUITS
+        function ajouterProduit() {
+            const refFR = document.getElementById('refFR').value.trim();
+            const refALL = document.getElementById('refALL').value.trim();
+            const designation = document.getElementById('designation').value.trim();
+            const colisage = document.getElementById('colisage').value.trim();
+            const prixAchat = document.getElementById('prixAchat').value.trim();
+
+            if (!refFR || !designation) {
+                alert('⚠️ Veuillez remplir au moins les champs Réf FR et Désignation');
+                return;
+            }
+
+            // Vérifier si la référence existe déjà
+            const existe = database.produits.find(p => 
+                p.refFR === refFR || (refALL && p.refALL === refALL)
+            );
+            
+            if (existe) {
+                alert('⚠️ Cette référence existe déjà dans la base de données');
+                return;
+            }
+
+            database.produits.push({
+                refFR,
+                refALL: refALL || 'N/A',
+                designation,
+                prixAchat: prixAchat ? parseFloat(prixAchat) : null,
+                colisage: colisage ? parseInt(colisage) : null
+            });
+
+            sauvegarderDonnees();
+            afficherReferentiel();
+
+            // Réinitialiser le formulaire
+            document.getElementById('refFR').value = '';
+            document.getElementById('refALL').value = '';
+            document.getElementById('designation').value = '';
+            document.getElementById('prixAchat').value = '';
+            document.getElementById('colisage').value = '';
+
+            alert('✅ Produit ajouté avec succès !');
+        }
+
+        function afficherReferentiel() {
+            const container = document.getElementById('listeReferentiel');
+            
+            if (database.produits.length === 0) {
+                container.innerHTML = '<div class="empty-state">📦 Aucun produit dans le référentiel. Ajoutez-en un ci-dessus !</div>';
+                return;
+            }
+
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Réf FR</th>
+                            <th>Réf ALL</th>
+                            <th>Désignation</th>
+                            <th>Prix d'achat (€)</th>
+                            <th>Colisage</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            database.produits.forEach((produit, index) => {
+                html += `
+                    <tr>
+                        <td><strong>${produit.refFR}</strong></td>
+                        <td>${produit.refALL}</td>
+                        <td>${produit.designation}</td>
+                        <td>${produit.prixAchat ? produit.prixAchat.toFixed(2) + ' €' : '-'}</td>
+                        <td>${produit.colisage || '-'}</td>
+                        <td>
+                            <button class="btn btn-danger action-btn" onclick="supprimerProduit(${index})">🗑️ Supprimer</button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+            container.innerHTML = html;
+            
+            // Rafraîchir aussi la liste déroulante des règles spéciales
+            peuplerSelectProduits();
+        }
+
+        function filtrerReferentiel() {
+            const search = document.getElementById('searchRef').value.toLowerCase();
+            const rows = document.querySelectorAll('#listeReferentiel tbody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(search) ? '' : 'none';
+            });
+        }
+
+        function supprimerProduit(index) {
+            if (confirm('⚠️ Êtes-vous sûr de vouloir supprimer ce produit ?')) {
+                const produit = database.produits[index];
+                
+                // Supprimer aussi les données associées
+                delete database.stocks[produit.refFR];
+                delete database.conso[produit.refFR];
+                delete database.forecast[produit.refFR];
+                delete database.commande[produit.refFR];
+                
+                database.produits.splice(index, 1);
+                sauvegarderDonnees();
+                afficherReferentiel();
+                alert('✅ Produit supprimé');
+            }
+        }
+
+        // IMPORT FICHIERS
+        function updateFileName(inputId, displayId) {
+            const input = document.getElementById(inputId);
+            const display = document.getElementById(displayId);
+            display.textContent = input.files.length > 0 ? input.files[0].name : 'Aucun fichier sélectionné';
+        }
+
+        function trouverProduit(ref) {
+            return database.produits.find(p => p.refFR === ref || p.refALL === ref);
+        }
+
+        function importerStock() {
+            const fileInput = document.getElementById('fileStock');
+            if (!fileInput.files.length) {
+                alert('⚠️ Veuillez sélectionner un fichier');
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, {type: 'array'});
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    
+                    // Lire les données brutes sans en-tête pour accéder aux colonnes par index
+                    const rawData = XLSX.utils.sheet_to_json(firstSheet, {header: 1});
+
+                    console.log('Import stock - Nombre de lignes:', rawData.length);
+                    console.log('Exemple de ligne:', rawData[1]); // Ligne 2 (après en-tête)
+
+                    let imported = 0;
+                    let errors = [];
+                    let notFound = [];
+
+                    // Ignorer la première ligne (en-tête) et commencer à la ligne 2
+                    for (let i = 1; i < rawData.length; i++) {
+                        const row = rawData[i];
+                        
+                        // Colonne B = index 1 (Réf FR)
+                        // Colonne E = index 4 (Réf ALL)
+                        // Colonne G = index 6 (Stock dispo)
+                        const refFR = row[1];
+                        const refALL = row[4];
+                        const stock = row[6];
+
+                        if (stock !== undefined && stock !== '' && stock !== null) {
+                            let produit = null;
+                            let refUtilisee = '';
+                            
+                            // Essayer d'abord avec la référence FR (colonne B)
+                            if (refFR && refFR !== '' && refFR !== 'NaN' && refFR !== 'nan') {
+                                const refFRStr = refFR.toString().trim();
+                                produit = trouverProduit(refFRStr);
+                                refUtilisee = refFRStr;
+                            }
+                            
+                            // Si pas trouvé avec réf FR, essayer avec réf ALL (colonne E)
+                            if (!produit && refALL && refALL !== '' && refALL !== 'NaN' && refALL !== 'nan') {
+                                const refALLStr = refALL.toString().trim();
+                                produit = trouverProduit(refALLStr);
+                                refUtilisee = refALLStr;
+                            }
+                            
+                            if (produit) {
+                                const stockValue = parseFloat(stock);
+                                if (!isNaN(stockValue)) {
+                                    database.stocks[produit.refFR] = stockValue;
+                                    imported++;
+                                    console.log(`✓ ${produit.refFR}: stock = ${stockValue}`);
+                                } else {
+                                    errors.push(`Ligne ${i + 1}: Valeur de stock invalide "${stock}" pour ${refUtilisee}`);
+                                }
+                            } else {
+                                if (refUtilisee) {
+                                    notFound.push(`Ligne ${i + 1}: Référence "${refUtilisee}" non trouvée dans le référentiel`);
+                                }
+                            }
+                        }
+                    }
+
+                    sauvegarderDonnees();
+                    afficherEtatImports();
+                    
+                    let message = '';
+                    
+                    if (imported > 0) {
+                        message += `✅ Import terminé!\n\n`;
+                        message += `• ${imported} produits importés avec succès\n`;
+                        message += `\n📍 Colonnes utilisées:\n`;
+                        message += `  • Colonne B : Réf FR\n`;
+                        message += `  • Colonne E : Réf ALL\n`;
+                        message += `  • Colonne G : Stock disponible\n`;
+                    } else {
+                        message += `⚠️ Aucun stock importé!\n\n`;
+                    }
+                    
+                    if (notFound.length > 0) {
+                        message += `\n⚠️ ${notFound.length} références non trouvées dans le référentiel:\n`;
+                        message += notFound.slice(0, 5).join('\n');
+                        if (notFound.length > 5) message += `\n... et ${notFound.length - 5} autres`;
+                    }
+                    
+                    if (errors.length > 0) {
+                        message += `\n❌ ${errors.length} erreurs:\n`;
+                        message += errors.slice(0, 5).join('\n');
+                        if (errors.length > 5) message += `\n... et ${errors.length - 5} autres`;
+                    }
+                    
+                    if (imported === 0 && rawData.length > 1) {
+                        message += `\n\n💡 Vérifiez que votre fichier contient bien:`;
+                        message += `\n• Colonne B : Réf FR`;
+                        message += `\n• Colonne E : Réf ALL`;
+                        message += `\n• Colonne G : Stock disponible`;
+                    }
+                    
+                    alert(message);
+                } catch (error) {
+                    console.error('Erreur import stock:', error);
+                    alert('❌ Erreur lors de la lecture du fichier:\n' + error.message);
+                }
+            };
+
+            reader.readAsArrayBuffer(file);
+        }
+
+        function importerConso() {
+            const fileInput = document.getElementById('fileConso');
+            if (!fileInput.files.length) {
+                alert('⚠️ Veuillez sélectionner un fichier');
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, {type: 'array'});
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const rows = XLSX.utils.sheet_to_json(firstSheet, {header: 1, raw: false, defval: ''});
+
+                    console.log('Import conso - Nombre de lignes:', rows.length);
+                    console.log('En-têtes:', rows[0]);
+
+                    // Trouver la ligne d'en-tête avec les mois
+                    let headerRowIndex = -1;
+                    let colonnesMois = {};
+                    
+                    for (let i = 0; i < Math.min(5, rows.length); i++) {
+                        const row = rows[i];
+                        for (let j = 0; j < row.length; j++) {
+                            const cell = (row[j] || '').toString().toLowerCase();
+                            if (cell.includes('janvier') || cell.includes('février') || cell.includes('mars') || 
+                                cell.includes('jan') || cell.includes('fev') || cell.includes('fév') ||
+                                cell.includes('2024') || cell.includes('2025')) {
+                                headerRowIndex = i;
+                                break;
+                            }
+                        }
+                        if (headerRowIndex >= 0) break;
+                    }
+
+                    if (headerRowIndex < 0) {
+                        alert('⚠️ Impossible de trouver la ligne d\'en-tête avec les mois');
+                        return;
+                    }
+
+                    // Parser les en-têtes pour identifier les colonnes de mois
+                    const headers = rows[headerRowIndex];
+                    const moisRegex = /(janvier|février|fevrier|mars|avril|mai|juin|juillet|août|aout|septembre|octobre|novembre|décembre|decembre)\s*(\d{4})/i;
+                    const moisAbregRegex = /(jan|fév|fev|mar|avr|mai|jun|juil|jul|aoû|aou|sep|oct|nov|déc|dec).*(\d{4})/i;
+                    
+                    for (let colIndex = 0; colIndex < headers.length; colIndex++) {
+                        const header = (headers[colIndex] || '').toString().trim();
+                        let match = header.match(moisRegex) || header.match(moisAbregRegex);
+                        
+                        if (match) {
+                            const moisNom = match[1].toLowerCase();
+                            const annee = parseInt(match[2]);
+                            
+                            // Convertir le nom du mois en numéro
+                            const moisMap = {
+                                'janvier': 0, 'jan': 0,
+                                'février': 1, 'fevrier': 1, 'fév': 1, 'fev': 1,
+                                'mars': 2, 'mar': 2,
+                                'avril': 3, 'avr': 3,
+                                'mai': 4,
+                                'juin': 5, 'jun': 5,
+                                'juillet': 6, 'juil': 6, 'jul': 6,
+                                'août': 7, 'aout': 7, 'aoû': 7, 'aou': 7,
+                                'septembre': 8, 'sep': 8, 'sept': 8,
+                                'octobre': 9, 'oct': 9,
+                                'novembre': 10, 'nov': 10,
+                                'décembre': 11, 'decembre': 11, 'déc': 11, 'dec': 11
+                            };
+                            
+                            const moisNum = moisMap[moisNom];
+                            if (moisNum !== undefined) {
+                                const date = new Date(annee, moisNum, 1);
+                                colonnesMois[colIndex] = date;
+                                console.log(`Colonne ${colIndex}: ${header} => ${date.toLocaleDateString('fr-FR', {month: 'long', year: 'numeric'})}`);
+                            }
+                        }
+                    }
+
+                    if (Object.keys(colonnesMois).length === 0) {
+                        alert('⚠️ Aucune colonne de mois détectée dans le fichier');
+                        return;
+                    }
+
+                    // Stocker toutes les consos par produit
+                    const consoParProduit = {};
+
+                    // Parser les lignes de données (après l'en-tête)
+                    for (let i = headerRowIndex + 1; i < rows.length; i++) {
+                        const row = rows[i];
+                        if (!row || row.length === 0) continue;
+                        
+                        // Extraire la référence de la première colonne
+                        const cellule = (row[0] || '').toString();
+                        const refMatch = cellule.match(/\[(\w+)\]/);
+                        
+                        if (refMatch) {
+                            const ref = refMatch[1];
+                            const produit = trouverProduit(ref);
+                            
+                            if (produit) {
+                                if (!consoParProduit[produit.refFR]) {
+                                    consoParProduit[produit.refFR] = [];
+                                }
+                                
+                                // Lire les valeurs pour chaque mois
+                                for (const colIndex in colonnesMois) {
+                                    const valeur = row[colIndex];
+                                    if (valeur && valeur !== '' && !isNaN(parseFloat(valeur))) {
+                                        consoParProduit[produit.refFR].push({
+                                            date: colonnesMois[colIndex],
+                                            qte: parseFloat(valeur)
+                                        });
+                                    }
+                                }
+                            } else {
+                                console.warn(`Référence non trouvée: ${ref}`);
+                            }
+                        }
+                    }
+
+                    // Calculer la moyenne des 12 derniers mois pour chaque produit
+                    const maintenant = new Date();
+                    const il_y_a_12_mois = new Date(maintenant.getFullYear(), maintenant.getMonth() - 12, 1);
+
+                    let imported = 0;
+                    let errors = 0;
+
+                    for (const refFR in consoParProduit) {
+                        const consos = consoParProduit[refFR];
+                        
+                        // Filtrer les 12 derniers mois
+                        const consos12Mois = consos.filter(c => c.date >= il_y_a_12_mois && c.date <= maintenant);
+                        
+                        if (consos12Mois.length > 0) {
+                            // Calculer la moyenne
+                            const total = consos12Mois.reduce((sum, c) => sum + c.qte, 0);
+                            const moyenne = total / consos12Mois.length;
+                            
+                            database.conso[refFR] = Math.round(moyenne * 100) / 100; // Arrondir à 2 décimales
+                            imported++;
+                            
+                            console.log(`${refFR}: ${consos12Mois.length} mois trouvés, total = ${total}, moyenne = ${moyenne.toFixed(2)}`);
+                        } else if (consos.length > 0) {
+                            // Si pas de données dans les 12 derniers mois, prendre la moyenne de toutes les données disponibles
+                            const total = consos.reduce((sum, c) => sum + c.qte, 0);
+                            const moyenne = total / consos.length;
+                            database.conso[refFR] = Math.round(moyenne * 100) / 100;
+                            imported++;
+                            console.log(`${refFR}: Aucune donnée dans les 12 derniers mois, moyenne sur ${consos.length} mois = ${moyenne.toFixed(2)}`);
+                        } else {
+                            errors++;
+                            console.warn(`${refFR}: Aucune donnée trouvée`);
+                        }
+                    }
+
+                    sauvegarderDonnees();
+                    afficherEtatImports();
+                    
+                    let message = `✅ Import terminé!\n\n`;
+                    message += `• ${imported} produits importés (moyenne calculée)\n`;
+                    if (errors > 0) {
+                        message += `• ${errors} produits sans données\n`;
+                    }
+                    message += `\n📅 Période analysée: ${il_y_a_12_mois.toLocaleDateString('fr-FR', {month: 'long', year: 'numeric'})} à ${maintenant.toLocaleDateString('fr-FR', {month: 'long', year: 'numeric'})}`;
+                    message += `\n📊 Colonnes de mois détectées: ${Object.keys(colonnesMois).length}`;
+                    
+                    alert(message);
+                } catch (error) {
+                    console.error('Erreur import conso:', error);
+                    alert('❌ Erreur lors de la lecture du fichier:\n' + error.message + '\n\nFormat attendu: Colonne A avec [Référence] et colonnes avec mois (ex: janvier 2024, février 2024...)');
+                }
+            };
+
+            reader.readAsArrayBuffer(file);
+        }
+
+        function importerForecast() {
+            const fileInput = document.getElementById('fileForecast');
+            if (!fileInput.files.length) {
+                alert('⚠️ Veuillez sélectionner un fichier');
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, {type: 'array'});
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const rows = XLSX.utils.sheet_to_json(firstSheet, {raw: false, defval: ''});
+
+                    console.log('Import forecast - Nombre de lignes:', rows.length);
+                    console.log('Colonnes disponibles:', Object.keys(rows[0] || {}));
+
+                    // Récupérer le mois sélectionné manuellement
+                    const moisSelectElement = document.getElementById('moisForecast');
+                    const moisActuel = parseInt(moisSelectElement.value);
+                    
+                    // Mapping des mois avec leurs variantes (y compris avec suffixes .1, .2, etc.)
+                    const moisInitiales = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
+                    const initialeAttendue = moisInitiales[moisActuel];
+                    
+                    // Mapping complet des mois
+                    const moisNoms = {
+                        0: ['J', 'j', 'Jan', 'Janvier', 'janvier', 'JAN', 'JANVIER', '01', '1'],
+                        1: ['F', 'f', 'Fév', 'Fev', 'Février', 'Fevrier', 'février', 'fevrier', 'FEV', 'FEVRIER', '02', '2'],
+                        2: ['M', 'm', 'Mar', 'Mars', 'mars', 'MAR', 'MARS', '03', '3'],
+                        3: ['A', 'a', 'Avr', 'Avril', 'avril', 'AVR', 'AVRIL', '04', '4'],
+                        4: ['M', 'm', 'M.1', 'M.2', 'Mai', 'mai', 'MAI', '05', '5'],
+                        5: ['J', 'j', 'J.1', 'J.2', 'Jun', 'Juin', 'juin', 'JUN', 'JUIN', '06', '6'],
+                        6: ['J', 'j', 'J.1', 'J.2', 'Jul', 'Juil', 'Juillet', 'juillet', 'JUL', 'JUILLET', '07', '7'],
+                        7: ['A', 'a', 'A.1', 'A.2', 'Aoû', 'Aou', 'Août', 'Aout', 'août', 'aout', 'AOU', 'AOUT', '08', '8'],
+                        8: ['S', 's', 'Sep', 'Sept', 'Septembre', 'septembre', 'SEP', 'SEPTEMBRE', '09', '9'],
+                        9: ['O', 'o', 'Oct', 'Octobre', 'octobre', 'OCT', 'OCTOBRE', '10'],
+                        10: ['N', 'n', 'Nov', 'Novembre', 'novembre', 'NOV', 'NOVEMBRE', '11'],
+                        11: ['D', 'd', 'Déc', 'Dec', 'Décembre', 'Decembre', 'décembre', 'decembre', 'DEC', 'DECEMBRE', '12']
+                    };
+
+                    // Trouver la colonne correspondant au mois sélectionné
+                    let colonneMonth = null;
+                    const colonnes = Object.keys(rows[0] || {});
+                    
+                    // Compter combien de fois chaque initiale apparaît pour déterminer le bon suffixe
+                    const compteurInitiales = {};
+                    const positionsInitiales = {};
+                    
+                    // Identifier les positions de chaque initiale
+                    colonnes.forEach((col, index) => {
+                        const colTrimmed = col.toString().trim();
+                        
+                        // IMPORTANT: Ne prendre que les colonnes d'une seule lettre OU avec suffixe .1, .2, etc.
+                        // Pour éviter de prendre "Désignation" pour "D"
+                        const estColonneMois = /^[JFMASOND](\.\d+)?$/i.test(colTrimmed);
+                        
+                        if (estColonneMois) {
+                            const initiale = colTrimmed.charAt(0).toUpperCase();
+                            
+                            if (!compteurInitiales[initiale]) {
+                                compteurInitiales[initiale] = 0;
+                                positionsInitiales[initiale] = [];
+                            }
+                            positionsInitiales[initiale].push({col: col, index: index});
+                            compteurInitiales[initiale]++;
+                        }
+                    });
+
+                    console.log('Compteur initiales:', compteurInitiales);
+                    console.log('Positions:', positionsInitiales);
+
+                    // Mapping des mois vers leur position dans l'année
+                    const positionsMois = {
+                        0: 0, 1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9, 10: 10, 11: 11
+                    };
+                    
+                    // Déterminer quelle colonne correspond au mois sélectionné
+                    // Pour Mai (4), Juin (5), Juillet (6), Août (7) qui ont des homonymes
+                    if (moisActuel === 4 && positionsInitiales['M']) { // Mai
+                        const posM = positionsInitiales['M'];
+                        if (posM.length > 1) {
+                            colonneMonth = posM[1].col; // Deuxième M = Mai
+                        } else {
+                            colonneMonth = posM[0].col; // S'il n'y a qu'un M
+                        }
+                    } else if (moisActuel === 5 && positionsInitiales['J']) { // Juin
+                        const posJ = positionsInitiales['J'];
+                        if (posJ.length > 1) {
+                            colonneMonth = posJ[1].col; // Deuxième J = Juin
+                        } else {
+                            colonneMonth = posJ[0].col;
+                        }
+                    } else if (moisActuel === 6 && positionsInitiales['J']) { // Juillet
+                        const posJ = positionsInitiales['J'];
+                        if (posJ.length > 2) {
+                            colonneMonth = posJ[2].col; // Troisième J = Juillet
+                        } else if (posJ.length > 1) {
+                            colonneMonth = posJ[1].col;
+                        } else {
+                            colonneMonth = posJ[0].col;
+                        }
+                    } else if (moisActuel === 7 && positionsInitiales['A']) { // Août
+                        const posA = positionsInitiales['A'];
+                        if (posA.length > 1) {
+                            colonneMonth = posA[1].col; // Deuxième A = Août
+                        } else {
+                            colonneMonth = posA[0].col;
+                        }
+                    } else {
+                        // Pour les autres mois (pas d'ambiguïté)
+                        // Utiliser la même logique que ci-dessus: chercher dans positionsInitiales
+                        const initialeAttendue = moisInitiales[moisActuel];
+                        if (positionsInitiales[initialeAttendue] && positionsInitiales[initialeAttendue].length > 0) {
+                            colonneMonth = positionsInitiales[initialeAttendue][0].col;
+                        }
+                    }
+
+                    if (!colonneMonth) {
+                        const moisTexte = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 
+                                          'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'][moisActuel];
+                        alert(`⚠️ Aucune colonne trouvée pour le mois sélectionné (${moisTexte}).\n\nColonnes disponibles: ${colonnes.join(', ')}\n\nVérifiez que votre fichier contient bien une colonne pour ${moisTexte}.`);
+                        return;
+                    }
+
+                    let imported = 0;
+                    let errors = 0;
+
+                    rows.forEach(row => {
+                        // Détecter la référence FR en priorité
+                        let refFR = row['réf FR'] || row['Réf FR'] || row['Ref FR'] || row['REF FR'] ||
+                                    row['Référence FR'] || row['Reference FR'] || row['RefFR'];
+                        
+                        // Si pas de réf FR, chercher la réf ALL
+                        let refALL = row['réf all'] || row['Réf ALL'] || row['Ref ALL'] || row['REF ALL'] ||
+                                     row['Référence ALL'] || row['Reference ALL'] || row['RefALL'];
+                        
+                        const forecast = row[colonneMonth];
+
+                        if (forecast !== undefined && forecast !== '' && forecast !== null) {
+                            let produit = null;
+                            
+                            // Essayer d'abord avec la réf FR
+                            if (refFR && refFR !== 'NaN' && refFR !== 'nan') {
+                                produit = trouverProduit(refFR.toString().trim());
+                            }
+                            
+                            // Si pas trouvé avec réf FR, essayer avec réf ALL
+                            if (!produit && refALL && refALL !== 'NaN' && refALL !== 'nan') {
+                                produit = trouverProduit(refALL.toString().trim());
+                            }
+                            
+                            if (produit) {
+                                const forecastValue = parseFloat(forecast);
+                                if (!isNaN(forecastValue)) {
+                                    database.forecast[produit.refFR] = forecastValue;
+                                    imported++;
+                                }
+                            } else {
+                                errors++;
+                            }
+                        }
+                    });
+
+                    sauvegarderDonnees();
+                    afficherEtatImports();
+                    
+                    const moisTexte = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 
+                                      'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'][moisActuel];
+                    
+                    let message = `✅ Import terminé!\n\n`;
+                    message += `📅 Mois sélectionné: ${moisTexte}\n`;
+                    message += `📊 Colonne utilisée: "${colonneMonth}"\n\n`;
+                    message += `• ${imported} produits importés\n`;
+                    if (errors > 0) {
+                        message += `• ${errors} références non trouvées\n`;
+                    }
+                    
+                    alert(message);
+                } catch (error) {
+                    console.error('Erreur import forecast:', error);
+                    alert('❌ Erreur lors de la lecture du fichier:\n' + error.message + '\n\nFormat attendu: Réf FR | J | F | M | A | M | J | J | A | S | O | N | D');
+                }
+            };
+
+            reader.readAsArrayBuffer(file);
+        }
+
+        function afficherEtatImports() {
+            const container = document.getElementById('etatImports');
+            
+            const nbStock = Object.keys(database.stocks).length;
+            const nbConso = Object.keys(database.conso).length;
+            const nbForecast = Object.keys(database.forecast).length;
+            const nbProduits = database.produits.length;
+
+            let html = '<div class="stats-grid">';
+            html += `<div class="stat-card"><h3>Produits au référentiel</h3><div class="value">${nbProduits}</div></div>`;
+            html += `<div class="stat-card"><h3>Stock importés</h3><div class="value">${nbStock}</div></div>`;
+            html += `<div class="stat-card"><h3>Conso importées</h3><div class="value">${nbConso}</div></div>`;
+            html += `<div class="stat-card"><h3>Forecast importés</h3><div class="value">${nbForecast}</div></div>`;
+            html += '</div>';
+
+            container.innerHTML = html;
+        }
+
+        // CALCUL COMMANDE
+        function calculerCommande() {
+            if (database.produits.length === 0) {
+                alert('⚠️ Aucun produit dans le référentiel');
+                return;
+            }
+
+            database.commande = {};
+            let produitsCalcules = 0;
+            let produitsForecastOnly = 0;
+
+            database.produits.forEach(produit => {
+                const stock = database.stocks[produit.refFR] || 0;
+                const conso = database.conso[produit.refFR] || 0;
+                const forecast = database.forecast[produit.refFR] || 0;
+                const colisage = produit.colisage || null;
+
+                // Vérifier si ce produit est en mode "forecast only"
+                const isForecastOnly = estForecastOnly(produit.refFR);
+
+                let consoSur20Jours, stockAuJourReception, besoin, qteCalculee, qteCommande;
+
+                if (isForecastOnly) {
+                    // MODE FORECAST ONLY : Commande = Forecast uniquement
+                    consoSur20Jours = 0;
+                    stockAuJourReception = stock;
+                    besoin = 0;
+                    // Arrondir le forecast au supérieur
+                    qteCalculee = Math.ceil(forecast);
+                    qteCommande = Math.max(0, Math.ceil(forecast));
+                    produitsForecastOnly++;
+                } else {
+                    // MODE NORMAL : Formule complète avec délai de 20 jours
+                    // 1. Calculer la conso sur 20 jours (entre le 15 et le 5 du mois suivant)
+                    consoSur20Jours = Math.ceil((conso / 30) * 20);
+                    
+                    // 2. Stock prévisionnel au 5 novembre (date de réception)
+                    stockAuJourReception = Math.ceil(stock - consoSur20Jours);
+                    
+                    // 3. Besoin = 2 mois de stock - ARRONDI AU SUPÉRIEUR
+                    besoin = Math.ceil(2 * conso);
+                    
+                    // 4. Quantité à commander = Besoin - Stock au jour réception + Forecast
+                    qteCalculee = besoin - stockAuJourReception + forecast;
+                    qteCommande = Math.max(0, Math.ceil(qteCalculee)); // Arrondir au supérieur et minimum 0
+                }
+
+                // 5. Calculer la quantité en colis si colisage défini
+                let qteEnColis = null;
+                if (colisage && colisage > 0) {
+                    qteEnColis = Math.ceil(qteCommande / colisage);
+                }
+
+                database.commande[produit.refFR] = {
+                    stock,
+                    conso: Math.ceil(conso),
+                    forecast,
+                    consoSur20Jours,
+                    stockAuJourReception,
+                    besoin,
+                    qteCommande,
+                    qteEnColis,
+                    forecastOnly: isForecastOnly
+                };
+
+                produitsCalcules++;
+            });
+
+            sauvegarderDonnees();
+            afficherResultatCalcul();
+            
+            let message = `✅ Calcul terminé pour ${produitsCalcules} produits !\n\n`;
+            message += `📅 Commande passée le 15 → Réception le 5\n`;
+            message += `⏱️ Consommation sur 20 jours prise en compte\n`;
+            message += `🔼 Tous les arrondis au supérieur`;
+            
+            if (produitsForecastOnly > 0) {
+                message += `\n\n⚙️ ${produitsForecastOnly} produit(s) en mode "Forecast Only"`;
+            }
+            
+            alert(message);
+        }
+
+        function afficherResultatCalcul() {
+            const container = document.getElementById('resultatCalcul');
+            
+            if (Object.keys(database.commande).length === 0) {
+                container.innerHTML = '<div class="empty-state">🧮 Cliquez sur "Calculer les besoins" pour générer la commande</div>';
+                return;
+            }
+
+            let montantTotal = 0;
+
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Réf FR</th>
+                            <th>Réf ALL</th>
+                            <th>Désignation</th>
+                            <th>Stock actuel</th>
+                            <th>Conso/mois</th>
+                            <th>Conso 20j</th>
+                            <th>Stock au 5/11</th>
+                            <th>Forecast</th>
+                            <th>Besoin (2 mois)</th>
+                            <th>Qté à commander</th>
+                            <th>Colisage</th>
+                            <th>Qté en colis</th>
+                            <th>Prix unitaire</th>
+                            <th>Montant total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            database.produits.forEach(produit => {
+                const calcul = database.commande[produit.refFR];
+                if (!calcul) return;
+
+                const prixUnitaire = produit.prixAchat || 0;
+                const montantLigne = calcul.qteCommande * prixUnitaire;
+                montantTotal += montantLigne;
+
+                const rowClass = calcul.qteCommande > 0 ? (calcul.qteCommande > 100 ? 'highlight-red' : 'highlight-yellow') : 'highlight-green';
+
+                html += `
+                    <tr class="${rowClass}">
+                        <td><strong>${produit.refFR}${calcul.forecastOnly ? ' 🎯' : ''}</strong></td>
+                        <td>${produit.refALL}</td>
+                        <td>${produit.designation}${calcul.forecastOnly ? ' <span style="color: #667eea; font-weight: bold;">(Forecast Only)</span>' : ''}</td>
+                        <td>${calcul.stock}</td>
+                        <td>${calcul.forecastOnly ? '-' : calcul.conso}</td>
+                        <td>${calcul.forecastOnly ? '-' : calcul.consoSur20Jours}</td>
+                        <td>${calcul.forecastOnly ? '-' : calcul.stockAuJourReception}</td>
+                        <td>${calcul.forecast}</td>
+                        <td>${calcul.forecastOnly ? '-' : calcul.besoin}</td>
+                        <td><strong>${calcul.qteCommande}</strong></td>
+                        <td>${produit.colisage || '-'}</td>
+                        <td><strong style="color: #667eea;">${calcul.qteEnColis ? calcul.qteEnColis + ' colis' : '-'}</strong></td>
+                        <td>${prixUnitaire ? prixUnitaire.toFixed(2) + ' €' : '-'}</td>
+                        <td><strong>${montantLigne > 0 ? montantLigne.toFixed(2) + ' €' : '-'}</strong></td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                    </tbody>
+                    <tfoot>
+                        <tr style="background: #f0f0f0; font-weight: bold;">
+                            <td colspan="13" style="text-align: right; padding: 15px;">MONTANT TOTAL DE LA COMMANDE:</td>
+                            <td style="font-size: 1.2em; color: #667eea;">${montantTotal.toFixed(2)} €</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            `;
+            container.innerHTML = html;
+        }
+
+        // Fonction pour rendre les colonnes redimensionnables
+        function makeColumnsResizable(tableId) {
+            const table = document.getElementById(tableId);
+            if (!table) return;
+
+            const cols = table.querySelectorAll('th');
+            
+            cols.forEach((col, index) => {
+                const resizer = col.querySelector('.resizer');
+                if (!resizer) return;
+
+                let startX, startWidth, colIndex;
+
+                resizer.addEventListener('mousedown', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    startX = e.pageX;
+                    startWidth = col.offsetWidth;
+                    colIndex = index;
+                    
+                    // Ajouter une classe pour indiquer qu'on est en train de redimensionner
+                    resizer.style.background = 'rgba(255, 255, 255, 0.5)';
+                    document.body.style.cursor = 'col-resize';
+                    
+                    document.addEventListener('mousemove', resize);
+                    document.addEventListener('mouseup', stopResize);
+                });
+
+                function resize(e) {
+                    const diff = e.pageX - startX;
+                    const newWidth = Math.max(50, startWidth + diff); // Largeur minimum de 50px
+                    
+                    // Appliquer la largeur à l'en-tête
+                    col.style.width = newWidth + 'px';
+                    col.style.minWidth = newWidth + 'px';
+                    col.style.maxWidth = newWidth + 'px';
+                    
+                    // Appliquer aussi à toutes les cellules de cette colonne
+                    const rows = table.querySelectorAll('tbody tr, tfoot tr');
+                    rows.forEach(row => {
+                        const cell = row.cells[colIndex];
+                        if (cell) {
+                            cell.style.width = newWidth + 'px';
+                            cell.style.minWidth = newWidth + 'px';
+                            cell.style.maxWidth = newWidth + 'px';
+                        }
+                    });
+                }
+
+                function stopResize() {
+                    document.removeEventListener('mousemove', resize);
+                    document.removeEventListener('mouseup', stopResize);
+                    resizer.style.background = '';
+                    document.body.style.cursor = '';
+                }
+            });
+        }
+
+        function exporterCommande() {
+            if (Object.keys(database.commande).length === 0) {
+                alert('⚠️ Veuillez d\'abord calculer la commande');
+                return;
+            }
+
+            const data = [];
+            let montantTotal = 0;
+
+            database.produits.forEach(produit => {
+                const calcul = database.commande[produit.refFR];
+                if (calcul && calcul.qteCommande > 0) {
+                    const prixUnitaire = produit.prixAchat || 0;
+                    const montantLigne = calcul.qteCommande * prixUnitaire;
+                    montantTotal += montantLigne;
+
+                    data.push({
+                        'Réf FR': produit.refFR,
+                        'Réf ALL': produit.refALL,
+                        'Désignation': produit.designation,
+                        'Stock actuel': calcul.stock,
+                        'Conso mensuelle': calcul.conso,
+                        'Conso 20 jours': calcul.consoSur20Jours,
+                        'Stock au 5/11': calcul.stockAuJourReception,
+                        'Forecast': calcul.forecast,
+                        'Besoin (2 mois)': calcul.besoin,
+                        'Quantité à commander': calcul.qteCommande,
+                        'Colisage': produit.colisage || '',
+                        'Qté en colis': calcul.qteEnColis || '',
+                        'Prix unitaire': prixUnitaire,
+                        'Montant total': montantLigne.toFixed(2)
+                    });
+                }
+            });
+
+            // Ajouter une ligne de total
+            data.push({
+                'Réf FR': '',
+                'Réf ALL': '',
+                'Désignation': '',
+                'Stock actuel': '',
+                'Conso mensuelle': '',
+                'Conso 20 jours': '',
+                'Stock au 5/11': '',
+                'Forecast': '',
+                'Besoin (2 mois)': '',
+                'Quantité à commander': '',
+                'Colisage': '',
+                'Qté en colis': '',
+                'Prix unitaire': 'TOTAL:',
+                'Montant total': montantTotal.toFixed(2)
+            });
+
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Commande");
+            
+            const date = new Date().toISOString().split('T')[0];
+            XLSX.writeFile(wb, `commande_${date}.xlsx`);
+            
+            alert(`✅ Fichier de commande exporté !\n\nMontant total: ${montantTotal.toFixed(2)} €`);
+        }
+
+        // ORDER CONFIRMATION
+        function importerConfirmation() {
+            const fileInput = document.getElementById('fileConfirmation');
+            if (!fileInput.files.length) {
+                alert('⚠️ Veuillez sélectionner un fichier');
+                return;
+            }
+
+            if (Object.keys(database.commande).length === 0) {
+                alert('⚠️ Vous devez d\'abord calculer une commande');
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, {type: 'array'});
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    
+                    // Lire avec l'option header: 1 pour avoir les données par index de colonne
+                    const rowsArray = XLSX.utils.sheet_to_json(firstSheet, {header: 1, raw: false, defval: ''});
+
+                    console.log('Import confirmation - Nombre de lignes:', rowsArray.length);
+                    console.log('Première ligne (en-têtes):', rowsArray[0]);
+
+                    database.confirmation = {};
+                    database.confirmationDetails = {}; // Nouvelle structure pour stocker J et K séparément
+                    let imported = 0;
+                    let errors = 0;
+
+                    // Commencer à la ligne 2 (index 1) pour sauter les en-têtes
+                    for (let i = 1; i < rowsArray.length; i++) {
+                        const row = rowsArray[i];
+                        
+                        // Colonne G = index 6 (Article-No. / Réf ALL)
+                        // Colonne J = index 9 (Quantity order)
+                        // Colonne K = index 10 (Quantity available)
+                        const refALL = row[6]; // Colonne G
+                        const qtyOrder = row[9]; // Colonne J
+                        const qtyAvailable = row[10]; // Colonne K
+
+                        if (refALL && refALL !== '') {
+                            const refStr = refALL.toString().trim();
+                            const produit = database.produits.find(p => p.refALL === refStr);
+                            
+                            if (produit) {
+                                const qtyOrderValue = qtyOrder !== undefined && qtyOrder !== '' && qtyOrder !== null ? parseFloat(qtyOrder) : 0;
+                                const qtyAvailableValue = qtyAvailable !== undefined && qtyAvailable !== '' && qtyAvailable !== null ? parseFloat(qtyAvailable) : 0;
+                                
+                                if (!isNaN(qtyOrderValue) || !isNaN(qtyAvailableValue)) {
+                                    // Stocker la quantité confirmée (colonne J)
+                                    database.confirmation[produit.refFR] = qtyOrderValue;
+                                    
+                                    // Stocker les détails (J et K séparément)
+                                    database.confirmationDetails[produit.refFR] = {
+                                        qtyOrder: qtyOrderValue,
+                                        qtyAvailable: qtyAvailableValue
+                                    };
+                                    
+                                    imported++;
+                                    console.log(`✓ ${produit.refFR} (${refStr}): Order=${qtyOrderValue}, Available=${qtyAvailableValue}`);
+                                }
+                            } else {
+                                errors++;
+                                console.warn(`Référence ALL non trouvée: ${refStr}`);
+                            }
+                        }
+                    }
+
+                    sauvegarderDonnees();
+                    comparerConfirmation();
+                    
+                    let message = `✅ Import terminé!\n\n`;
+                    message += `• ${imported} produits confirmés\n`;
+                    if (errors > 0) {
+                        message += `• ${errors} références ALL non trouvées dans le référentiel\n`;
+                    }
+                    message += `\n📊 Colonnes utilisées:\n`;
+                    message += `  • G (Article-No. / Réf ALL)\n`;
+                    message += `  • J (Quantity order)\n`;
+                    message += `  • K (Quantity available)`;
+                    
+                    alert(message);
+                } catch (error) {
+                    console.error('Erreur import confirmation:', error);
+                    alert('❌ Erreur lors de la lecture du fichier:\n' + error.message);
+                }
+            };
+
+            reader.readAsArrayBuffer(file);
+        }
+
+        function comparerConfirmation() {
+            const container = document.getElementById('resultatConfirmation');
+
+            let nbOK = 0;
+            let nbManquant = 0;
+            let nbPartiel = 0;
+            let montantCommande = 0;
+            let montantConfirme = 0;
+
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Réf FR</th>
+                            <th>Réf ALL</th>
+                            <th>Désignation</th>
+                            <th>Qté Commandée</th>
+                            <th>Qté Confirmée</th>
+                            <th>Écart Confirmé</th>
+                            <th>Qté Disponible</th>
+                            <th>Écart Disponible</th>
+                            <th>Prix unitaire</th>
+                            <th>Montant Commandé</th>
+                            <th>Montant Confirmé</th>
+                            <th>Écart €</th>
+                            <th>Statut</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            database.produits.forEach(produit => {
+                const commande = database.commande[produit.refFR];
+                if (!commande || commande.qteCommande === 0) return;
+
+                const qteCommande = commande.qteCommande;
+                
+                // Récupérer les détails de la confirmation (colonnes J et K)
+                const details = database.confirmationDetails[produit.refFR] || { qtyOrder: 0, qtyAvailable: 0 };
+                const qteConfirmee = details.qtyOrder; // Colonne J
+                const qteDisponible = details.qtyAvailable; // Colonne K
+                
+                const ecartQteConfirmee = qteConfirmee - qteCommande;
+                const ecartQteDisponible = qteDisponible - qteCommande;
+                
+                const prixUnitaire = produit.prixAchat || 0;
+                const montantLigneCommande = qteCommande * prixUnitaire;
+                const montantLigneConfirme = qteConfirmee * prixUnitaire;
+                const ecartMontant = montantLigneConfirme - montantLigneCommande;
+
+                montantCommande += montantLigneCommande;
+                montantConfirme += montantLigneConfirme;
+
+                let statut = '';
+                let rowClass = '';
+
+                if (qteConfirmee === 0) {
+                    statut = '❌ Non confirmé';
+                    rowClass = 'highlight-red';
+                    nbManquant++;
+                } else if (qteConfirmee < qteCommande) {
+                    statut = '⚠️ Partiel';
+                    rowClass = 'highlight-yellow';
+                    nbPartiel++;
+                } else {
+                    statut = '✅ OK';
+                    rowClass = 'highlight-green';
+                    nbOK++;
+                }
+
+                html += `
+                    <tr class="${rowClass}">
+                        <td><strong>${produit.refFR}</strong></td>
+                        <td>${produit.refALL}</td>
+                        <td>${produit.designation}</td>
+                        <td>${qteCommande}</td>
+                        <td>${qteConfirmee}</td>
+                        <td><strong style="color: ${ecartQteConfirmee < 0 ? '#dc3545' : ecartQteConfirmee > 0 ? '#28a745' : '#666'};">${ecartQteConfirmee > 0 ? '+' : ''}${ecartQteConfirmee}</strong></td>
+                        <td>${qteDisponible}</td>
+                        <td><strong style="color: ${ecartQteDisponible < 0 ? '#dc3545' : ecartQteDisponible > 0 ? '#28a745' : '#666'};">${ecartQteDisponible > 0 ? '+' : ''}${ecartQteDisponible}</strong></td>
+                        <td>${prixUnitaire ? prixUnitaire.toFixed(2) + ' €' : '-'}</td>
+                        <td>${montantLigneCommande.toFixed(2)} €</td>
+                        <td>${montantLigneConfirme.toFixed(2)} €</td>
+                        <td><strong style="color: ${ecartMontant < 0 ? '#dc3545' : ecartMontant > 0 ? '#28a745' : '#666'};">${ecartMontant > 0 ? '+' : ''}${ecartMontant.toFixed(2)} €</strong></td>
+                        <td>${statut}</td>
+                    </tr>
+                `;
+            });
+
+            const ecartTotal = montantConfirme - montantCommande;
+
+            html += `
+                    </tbody>
+                    <tfoot>
+                        <tr style="background: #f0f0f0; font-weight: bold;">
+                            <td colspan="9" style="text-align: right; padding: 15px;">TOTAUX:</td>
+                            <td style="color: #667eea;">${montantCommande.toFixed(2)} €</td>
+                            <td style="color: ${montantConfirme >= montantCommande ? '#28a745' : '#dc3545'};">${montantConfirme.toFixed(2)} €</td>
+                            <td style="font-size: 1.1em; color: ${ecartTotal < 0 ? '#dc3545' : ecartTotal > 0 ? '#28a745' : '#666'};">${ecartTotal > 0 ? '+' : ''}${ecartTotal.toFixed(2)} €</td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            `;
+
+            const resume = `
+                <div class="stats-grid">
+                    <div class="stat-card"><h3>✅ Confirmés OK</h3><div class="value" style="color: #28a745;">${nbOK}</div></div>
+                    <div class="stat-card"><h3>⚠️ Partiels</h3><div class="value" style="color: #ffc107;">${nbPartiel}</div></div>
+                    <div class="stat-card"><h3>❌ Non confirmés</h3><div class="value" style="color: #dc3545;">${nbManquant}</div></div>
+                    <div class="stat-card">
+                        <h3>💰 Écart financier</h3>
+                        <div class="value" style="color: ${ecartTotal < 0 ? '#dc3545' : ecartTotal > 0 ? '#28a745' : '#667eea'};">
+                            ${ecartTotal > 0 ? '+' : ''}${ecartTotal.toFixed(2)} €
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = resume + html;
+        }
+
+        // DASHBOARD
+        function afficherDashboard() {
+            afficherStats();
+            afficherTableauComplet();
+        }
+
+        function afficherStats() {
+            const container = document.getElementById('statsGrid');
+            
+            const nbProduits = database.produits.length;
+            const stockTotal = Object.values(database.stocks).reduce((a, b) => a + b, 0);
+            const consoTotale = Object.values(database.conso).reduce((a, b) => a + b, 0);
+            const forecastTotal = Object.values(database.forecast).reduce((a, b) => a + b, 0);
+
+            let html = '';
+            html += `<div class="stat-card"><h3>📦 Produits référencés</h3><div class="value">${nbProduits}</div></div>`;
+            html += `<div class="stat-card"><h3>📊 Stock total</h3><div class="value">${Math.round(stockTotal)}</div></div>`;
+            html += `<div class="stat-card"><h3>📉 Conso mensuelle totale</h3><div class="value">${Math.round(consoTotale)}</div></div>`;
+            html += `<div class="stat-card"><h3>📈 Forecast total</h3><div class="value">${Math.round(forecastTotal)}</div></div>`;
+
+            container.innerHTML = html;
+        }
+
+        function afficherTableauComplet() {
+            const container = document.getElementById('tableauComplet');
+            
+            if (database.produits.length === 0) {
+                container.innerHTML = '<div class="empty-state">📦 Aucune donnée à afficher</div>';
+                return;
+            }
+
+            let html = `
+                <table id="dashboardTable">
+                    <thead>
+                        <tr>
+                            <th>Réf FR</th>
+                            <th>Réf ALL</th>
+                            <th>Désignation</th>
+                            <th>Stock</th>
+                            <th>Conso</th>
+                            <th>Forecast</th>
+                            <th>À commander</th>
+                            <th>Confirmé</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            database.produits.forEach(produit => {
+                const stock = database.stocks[produit.refFR] || 0;
+                const conso = database.conso[produit.refFR] || 0;
+                const forecast = database.forecast[produit.refFR] || 0;
+                const commande = database.commande[produit.refFR]?.qteCommande || 0;
+                const confirme = database.confirmation[produit.refFR] || 0;
+
+                html += `
+                    <tr>
+                        <td><strong>${produit.refFR}</strong></td>
+                        <td>${produit.refALL}</td>
+                        <td>${produit.designation}</td>
+                        <td>${stock}</td>
+                        <td>${conso}</td>
+                        <td>${forecast}</td>
+                        <td>${commande}</td>
+                        <td>${confirme}</td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        function filtrerDashboard() {
+            const search = document.getElementById('searchDashboard').value.toLowerCase();
+            const rows = document.querySelectorAll('#dashboardTable tbody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(search) ? '' : 'none';
+            });
+        }
+
+        // IMPORT/EXPORT RÉFÉRENTIEL
+        function importerReferentiel() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.csv,.xlsx,.xls';
+            
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+
+                reader.onload = function(event) {
+                    try {
+                        const data = new Uint8Array(event.target.result);
+                        const workbook = XLSX.read(data, {type: 'array'});
+                        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                        const rows = XLSX.utils.sheet_to_json(firstSheet, {raw: false, defval: ''});
+
+                        console.log('Fichier chargé, nombre de lignes:', rows.length);
+                        console.log('Exemple de ligne:', rows[0]);
+
+                        let imported = 0;
+                        let skipped = 0;
+                        let errors = [];
+
+                        rows.forEach((row, index) => {
+                            // Essayer différentes variations de noms de colonnes
+                            const refFR = row['Réf FR'] || row['Ref FR'] || row['REF FR'] || 
+                                         row['ref fr'] || row['Référence FR'] || row['Reference FR'] ||
+                                         row['RefFR'] || row['RéfFR'] || row['Référence'] || row['Reference'] ||
+                                         row['Réf'] || row['Ref'] || row['Code'];
+                            
+                            const refALL = row['Réf ALL'] || row['Ref ALL'] || row['REF ALL'] || 
+                                          row['ref all'] || row['Référence ALL'] || row['Reference ALL'] ||
+                                          row['RefALL'] || row['RéfALL'] || row['Réf DE'] || row['Ref DE'] ||
+                                          row['Reference DE'] || row['Référence DE'];
+                            
+                            const designation = row['Désignation'] || row['Designation'] || row['DESIGNATION'] ||
+                                              row['designation'] || row['Nom'] || row['nom'] || row['Produit'] ||
+                                              row['Description'] || row['description'];
+                            
+                            const prixAchat = row['Prix d\'achat'] || row['Prix d achat'] || row['Prix'] || 
+                                            row['prix'] || row['Prix Achat'] || row['prix achat'] ||
+                                            row['PA'] || row['pa'] || row['PRIX'];
+                            
+                            const colisage = row['Colisage'] || row['colisage'] || row['COLISAGE'] ||
+                                           row['Conditionnement'] || row['conditionnement'];
+
+                            // Vérifier qu'on a au minimum une référence FR et une désignation
+                            if (refFR && designation) {
+                                const refFRStr = refFR.toString().trim();
+                                const refALLStr = refALL ? refALL.toString().trim() : ''; // Peut être vide
+                                
+                                const existe = database.produits.find(p => 
+                                    p.refFR === refFRStr || (refALLStr && p.refALL === refALLStr)
+                                );
+                                
+                                if (!existe) {
+                                    database.produits.push({
+                                        refFR: refFRStr,
+                                        refALL: refALLStr || 'N/A',
+                                        designation: designation.toString().trim(),
+                                        prixAchat: prixAchat ? parseFloat(prixAchat) : null,
+                                        colisage: colisage ? parseInt(colisage) : null
+                                    });
+                                    imported++;
+                                    if (!refALLStr) {
+                                        console.log(`Produit ${refFRStr} ajouté sans référence ALL`);
+                                    }
+                                } else {
+                                    skipped++;
+                                }
+                            } else {
+                                errors.push(`Ligne ${index + 2}: données manquantes (Réf FR: ${refFR}, Désignation: ${designation})`);
+                            }
+                        });
+
+                        sauvegarderDonnees();
+                        afficherReferentiel();
+                        
+                        let message = `✅ Import terminé!\n\n`;
+                        message += `• ${imported} produits importés\n`;
+                        if (skipped > 0) message += `• ${skipped} produits déjà existants (ignorés)\n`;
+                        if (errors.length > 0) {
+                            message += `\n⚠️ ${errors.length} lignes ignorées:\n`;
+                            message += errors.slice(0, 5).join('\n');
+                            if (errors.length > 5) message += `\n... et ${errors.length - 5} autres`;
+                        }
+                        
+                        alert(message);
+                    } catch (error) {
+                        console.error('Erreur import:', error);
+                        alert('❌ Erreur lors de la lecture du fichier:\n' + error.message + '\n\nAssurez-vous que votre fichier Excel contient bien au minimum: "Réf FR" et "Désignation"');
+                    }
+                };
+
+                reader.onerror = function(error) {
+                    alert('❌ Erreur lors de la lecture du fichier');
+                    console.error(error);
+                };
+
+                reader.readAsArrayBuffer(file);
+            };
+
+            input.click();
+        }
+
+        function exporterReferentiel() {
+            if (database.produits.length === 0) {
+                alert('⚠️ Aucun produit à exporter');
+                return;
+            }
+
+            const data = database.produits.map(p => ({
+                'Réf FR': p.refFR,
+                'Réf ALL': p.refALL,
+                'Désignation': p.designation,
+                'Prix d\'achat': p.prixAchat || '',
+                'Colisage': p.colisage || ''
+            }));
+
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Référentiel");
+            
+            XLSX.writeFile(wb, 'referentiel_produits.xlsx');
+            alert('✅ Référentiel exporté !');
+        }
+
+        function reinitialiserDonnees() {
+            if (confirm('⚠️ Êtes-vous sûr de vouloir réinitialiser toutes les données (sauf le référentiel) ?')) {
+                database.stocks = {};
+                database.conso = {};
+                database.forecast = {};
+                database.commande = {};
+                database.confirmation = {};
+                
+                sauvegarderDonnees();
+                afficherEtatImports();
+                afficherResultatCalcul();
+                document.getElementById('resultatConfirmation').innerHTML = '';
+                alert('✅ Données réinitialisées');
+            }
+        }
+
+        // FONCTIONS ALERTES DE STOCK
+        let alertesData = [];
+
+        function calculerAlertes() {
+            const dateReceptionInput = document.getElementById('dateReception').value;
+            
+            if (!dateReceptionInput) {
+                alert('⚠️ Veuillez sélectionner une date de réception');
+                return;
+            }
+
+            const dateReception = new Date(dateReceptionInput);
+            const dateAujourdhui = new Date();
+            dateAujourdhui.setHours(0, 0, 0, 0);
+            dateReception.setHours(0, 0, 0, 0);
+
+            // Calculer le nombre de jours jusqu'à la réception
+            const joursAvantReception = Math.ceil((dateReception - dateAujourdhui) / (1000 * 60 * 60 * 24));
+
+            if (joursAvantReception < 0) {
+                alert('⚠️ La date de réception doit être dans le futur');
+                return;
+            }
+
+            alertesData = [];
+            let nbRupture = 0;
+            let nbAlerte = 0;
+            let nbOk = 0;
+
+            database.produits.forEach(produit => {
+                const stock = database.stocks[produit.refFR] || 0;
+                const consoMensuelle = database.conso[produit.refFR] || 0;
+                
+                // Calculer la consommation quotidienne (mois de 30 jours)
+                const consoQuotidienne = consoMensuelle / 30;
+                
+                // Calculer la consommation totale jusqu'à la réception
+                const consoJusquaReception = consoQuotidienne * joursAvantReception;
+                
+                // Calculer le stock prévu à la date de réception
+                const stockPrevu = stock - consoJusquaReception;
+                
+                // Déterminer le statut
+                let statut = '';
+                let couleur = '';
+                let icone = '';
+                
+                if (stock <= 0) {
+                    statut = '⛔ Rupture actuelle';
+                    couleur = '#dc3545';
+                    icone = '⛔';
+                    nbRupture++;
+                } else if (stockPrevu <= 0) {
+                    const joursAvantRupture = Math.floor(stock / consoQuotidienne);
+                    statut = `⚠️ Rupture dans ${joursAvantRupture} jours`;
+                    couleur = '#ff9800';
+                    icone = '⚠️';
+                    nbAlerte++;
+                } else {
+                    statut = '✅ Stock suffisant';
+                    couleur = '#28a745';
+                    icone = '✅';
+                    nbOk++;
+                }
+
+                alertesData.push({
+                    refFR: produit.refFR,
+                    refALL: produit.refALL,
+                    designation: produit.designation,
+                    stock: stock,
+                    consoMensuelle: consoMensuelle,
+                    consoQuotidienne: consoQuotidienne.toFixed(2),
+                    consoJusquaReception: consoJusquaReception.toFixed(2),
+                    stockPrevu: stockPrevu.toFixed(2),
+                    statut: statut,
+                    couleur: couleur,
+                    icone: icone,
+                    categorie: stock <= 0 ? 'rupture' : (stockPrevu <= 0 ? 'alerte' : 'ok')
+                });
+            });
+
+            // Trier par statut (rupture > alerte > ok)
+            alertesData.sort((a, b) => {
+                if (a.categorie === 'rupture' && b.categorie !== 'rupture') return -1;
+                if (a.categorie !== 'rupture' && b.categorie === 'rupture') return 1;
+                if (a.categorie === 'alerte' && b.categorie === 'ok') return -1;
+                if (a.categorie === 'ok' && b.categorie === 'alerte') return 1;
+                return parseFloat(a.stockPrevu) - parseFloat(b.stockPrevu);
+            });
+
+            // Afficher les statistiques
+            afficherStatsAlertes(nbRupture, nbAlerte, nbOk, joursAvantReception);
+            
+            // Afficher le tableau
+            afficherTableauAlertes();
+        }
+
+        function afficherStatsAlertes(nbRupture, nbAlerte, nbOk, jours) {
+            const container = document.getElementById('statsAlertes');
+            
+            let html = '<div class="stats-grid">';
+            html += `<div class="stat-card" style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); color: white;">
+                        <h3>⛔ Rupture actuelle</h3>
+                        <div class="value">${nbRupture}</div>
+                     </div>`;
+            html += `<div class="stat-card" style="background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%); color: white;">
+                        <h3>⚠️ Alerte stock</h3>
+                        <div class="value">${nbAlerte}</div>
+                     </div>`;
+            html += `<div class="stat-card" style="background: linear-gradient(135deg, #28a745 0%, #218838 100%); color: white;">
+                        <h3>✅ Stock OK</h3>
+                        <div class="value">${nbOk}</div>
+                     </div>`;
+            html += `<div class="stat-card">
+                        <h3>📅 Délai réception</h3>
+                        <div class="value">${jours} jours</div>
+                     </div>`;
+            html += '</div>';
+            
+            container.innerHTML = html;
+        }
+
+        function afficherTableauAlertes() {
+            const container = document.getElementById('tableauAlertes');
+            const filtre = document.getElementById('filtreAlertes').value;
+            
+            let dataFiltree = alertesData;
+            
+            if (filtre === 'rupture') {
+                dataFiltree = alertesData.filter(p => p.categorie === 'rupture');
+            } else if (filtre === 'alerte') {
+                dataFiltree = alertesData.filter(p => p.categorie === 'alerte');
+            } else if (filtre === 'critique') {
+                dataFiltree = alertesData.filter(p => p.categorie === 'rupture' || p.categorie === 'alerte');
+            }
+
+            if (dataFiltree.length === 0) {
+                container.innerHTML = '<div class="empty-state">✅ Aucun produit dans cette catégorie</div>';
+                return;
+            }
+
+            let html = `
+                <table id="tableAlertes">
+                    <thead>
+                        <tr>
+                            <th>Statut</th>
+                            <th>Réf FR</th>
+                            <th>Réf ALL</th>
+                            <th>Désignation</th>
+                            <th>Stock actuel</th>
+                            <th>Conso mensuelle</th>
+                            <th>Conso quotidienne</th>
+                            <th>Conso prévue</th>
+                            <th>Stock prévu</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            dataFiltree.forEach(produit => {
+                html += `
+                    <tr style="border-left: 4px solid ${produit.couleur};">
+                        <td><strong style="color: ${produit.couleur};">${produit.icone} ${produit.statut}</strong></td>
+                        <td><strong>${produit.refFR}</strong></td>
+                        <td>${produit.refALL}</td>
+                        <td>${produit.designation}</td>
+                        <td style="text-align: right; ${produit.stock <= 0 ? 'color: red; font-weight: bold;' : ''}">${Math.round(produit.stock)}</td>
+                        <td style="text-align: right;">${Math.round(produit.consoMensuelle)}</td>
+                        <td style="text-align: right;">${produit.consoQuotidienne}</td>
+                        <td style="text-align: right;">${produit.consoJusquaReception}</td>
+                        <td style="text-align: right; ${parseFloat(produit.stockPrevu) <= 0 ? 'color: red; font-weight: bold;' : 'color: green; font-weight: bold;'}">${produit.stockPrevu}</td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        function filtrerAlertes() {
+            const search = document.getElementById('searchAlertes').value.toLowerCase();
+            const rows = document.querySelectorAll('#tableAlertes tbody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(search) ? '' : 'none';
+            });
+        }
+
+        function exporterAlertes() {
+            if (alertesData.length === 0) {
+                alert('⚠️ Veuillez d\'abord effectuer une analyse');
+                return;
+            }
+
+            const filtre = document.getElementById('filtreAlertes').value;
+            let dataExport = alertesData;
+            
+            if (filtre === 'rupture') {
+                dataExport = alertesData.filter(p => p.categorie === 'rupture');
+            } else if (filtre === 'alerte') {
+                dataExport = alertesData.filter(p => p.categorie === 'alerte');
+            } else if (filtre === 'critique') {
+                dataExport = alertesData.filter(p => p.categorie === 'rupture' || p.categorie === 'alerte');
+            }
+
+            const data = dataExport.map(p => ({
+                'Statut': p.statut,
+                'Réf FR': p.refFR,
+                'Réf ALL': p.refALL,
+                'Désignation': p.designation,
+                'Stock actuel': Math.round(p.stock),
+                'Conso mensuelle': Math.round(p.consoMensuelle),
+                'Conso quotidienne': p.consoQuotidienne,
+                'Conso jusqu\'à réception': p.consoJusquaReception,
+                'Stock prévu': p.stockPrevu
+            }));
+
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Alertes Stock");
+            
+            const dateReception = document.getElementById('dateReception').value;
+            XLSX.writeFile(wb, `alertes_stock_${dateReception}.xlsx`);
+            alert('✅ Alertes exportées !');
+        }
+    </script>
+</body>
+</html>
